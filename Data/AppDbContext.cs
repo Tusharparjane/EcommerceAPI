@@ -13,6 +13,12 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<Cart> Carts { get; set; }
+
+    public DbSet<CartItem> CartItems { get; set; }
+    public DbSet<Order> Orders { get; set; }
+
+    public DbSet<OrderItem> OrderItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

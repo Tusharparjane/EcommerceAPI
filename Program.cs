@@ -1,10 +1,11 @@
 
 using EcommerceAPI.Data;
-using Microsoft.EntityFrameworkCore;
 using EcommerceAPI.Interfaces;
+using EcommerceAPI.Middleware;
 using EcommerceAPI.Repositories;
 using EcommerceAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -27,6 +28,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -58,6 +63,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+// Global Exception Middleware
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 

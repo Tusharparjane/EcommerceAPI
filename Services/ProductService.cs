@@ -7,14 +7,20 @@ namespace EcommerceAPI.Services;
 public class ProductService : IProductService
 {
     private readonly IProductRepository _repository;
+    private readonly ILogger<ProductService> _logger;
 
-    public ProductService(IProductRepository repository)
+    public ProductService(
+    IProductRepository repository,
+    ILogger<ProductService> logger)
     {
         _repository = repository;
+        _logger = logger;
     }
 
     public IEnumerable<ProductDto> GetAll()
     {
+        _logger.LogInformation("Fetching all products.");
+
         return _repository.GetAll().Select(p => new ProductDto
         {
             Id = p.Id,
@@ -30,6 +36,7 @@ public class ProductService : IProductService
     public ProductDto? GetById(int id)
     {
         var product = _repository.GetById(id);
+        _logger.LogInformation("Fetching product with ID {ProductId}", id);
 
         if (product == null)
             return null;
@@ -59,6 +66,9 @@ public class ProductService : IProductService
         };
 
         _repository.Add(product);
+        _logger.LogInformation(
+    "Product '{ProductName}' created successfully.",
+    product.Name);
 
         return new ProductDto
         {
@@ -85,11 +95,41 @@ public class ProductService : IProductService
             CategoryId = dto.CategoryId
         };
 
-        return _repository.Update(product) != null;
+        var updated = _repository.Update(product);
+
+        if (updated != null)
+        {
+            _logger.LogInformation(
+                "Product {ProductId} updated successfully.",
+                id);
+
+            return true;
+        }
+
+        _logger.LogWarning(
+            "Product {ProductId} not found for update.",
+            id);
+
+        return false;
     }
 
     public bool Delete(int id)
     {
-        return _repository.Delete(id);
+        var deleted = _repository.Delete(id);
+
+        if (deleted)
+        {
+            _logger.LogInformation(
+                "Product {ProductId} deleted successfully.",
+                id);
+        }
+        else
+        {
+            _logger.LogWarning(
+                "Product {ProductId} not found for deletion.",
+                id);
+        }
+
+        return deleted;
     }
 }
